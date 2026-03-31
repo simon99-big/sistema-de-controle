@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Técnicos COSTEC</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg-deep:#020b18;--bg-panel:#041020;--bg-card:#061428;--bg-card2:#071930;
+  --blue-core:#0a84ff;--blue-bright:#38b6ff;--blue-glow:#0a84ffaa;
+  --blue-dim:#0a84ff33;--blue-line:#0a84ff18;--cyan:#00e5ff;
+  --white:#e8f4ff;--white-dim:#e8f4ff88;
+  --red:#ff3b5c;--green:#00e676;--yellow:#ffd600;--orange:#ff9100;
+  --border:#0a84ff44;--border-bright:#0a84ff88;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg-deep);color:var(--white);font-family:'Rajdhani',sans-serif;min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(var(--blue-line) 1px,transparent 1px),linear-gradient(90deg,var(--blue-line) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0;}
+body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 50% at 50% -5%,#0a84ff14 0%,transparent 65%);pointer-events:none;z-index:0;}
+@keyframes scan{0%{transform:translateY(-100%);}100%{transform:translateY(100vh);}}
+.scanline{position:fixed;top:0;left:0;right:0;height:2px;background:linear-gradient(transparent,var(--blue-core),transparent);opacity:.12;animation:scan 9s linear infinite;pointer-events:none;z-index:1000;}
+
+/* ── SCREENS ── */
+.screen{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:200;background:var(--bg-deep);}
+.screen.hidden{display:none;}
+
+/* LOADING */
+#screen-loading{flex-direction:column;gap:20px;}
+.ld-logo{font-family:'Orbitron',monospace;font-size:24px;font-weight:900;letter-spacing:4px;text-shadow:0 0 20px var(--blue-core);}
+.ld-logo span{color:var(--blue-bright);}
+.ld-bar{width:220px;height:2px;background:var(--border);position:relative;overflow:hidden;}
+.ld-bar::after{content:'';position:absolute;top:0;left:-60%;width:60%;height:100%;background:linear-gradient(90deg,transparent,var(--blue-core),transparent);animation:ldslide 1.2s infinite;}
+@keyframes ldslide{to{left:160%;}}
+.ld-txt{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--blue-bright);letter-spacing:3px;opacity:.7;}
+
+/* AUTH BOX */
+.auth-box{position:relative;width:440px;max-width:96vw;padding:44px 38px 36px;background:var(--bg-panel);border:1px solid var(--border-bright);box-shadow:0 0 70px var(--blue-glow),inset 0 0 40px var(--blue-dim);clip-path:polygon(0 0,calc(100% - 26px) 0,100% 26px,100% 100%,26px 100%,0 calc(100% - 26px));}
+.auth-box::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--blue-core),var(--cyan),var(--blue-core),transparent);}
+.auth-logo{text-align:center;margin-bottom:28px;}
+.auth-logo .icon-ring{width:62px;height:62px;border-radius:50%;border:2px solid var(--blue-core);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;box-shadow:0 0 20px var(--blue-glow);font-size:28px;}
+.auth-logo .brand{font-family:'Orbitron',monospace;font-size:22px;font-weight:900;letter-spacing:4px;text-shadow:0 0 18px var(--blue-core);}
+.auth-logo .brand span{color:var(--blue-bright);}
+.auth-logo .sub{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--blue-bright);letter-spacing:6px;margin-top:4px;opacity:.65;}
+.auth-tabs{display:flex;margin-bottom:24px;border-bottom:1px solid var(--border);}
+.auth-tab{flex:1;padding:10px;background:transparent;border:none;color:var(--white-dim);font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:600;letter-spacing:1px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .2s;}
+.auth-tab:hover{color:var(--white);}
+.auth-tab.active{color:var(--blue-bright);border-bottom-color:var(--blue-core);}
+.auth-form{display:none;}
+.auth-form.active{display:block;}
+.fg{margin-bottom:16px;}
+.fg label{display:block;font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--blue-bright);letter-spacing:2px;margin-bottom:6px;}
+.fg input,.fg select{width:100%;padding:11px 14px;background:var(--bg-card);border:1px solid var(--border);color:var(--white);font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:500;outline:none;transition:border-color .2s,box-shadow .2s;clip-path:polygon(0 0,calc(100% - 7px) 0,100% 7px,100% 100%,7px 100%,0 calc(100% - 7px));}
+.fg input:focus,.fg select:focus{border-color:var(--blue-core);box-shadow:0 0 10px var(--blue-dim);}
+.fg select option{background:var(--bg-card);}
+.fg-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.btn-primary{width:100%;padding:13px;background:linear-gradient(135deg,var(--blue-core),#005fcb);border:none;color:#fff;font-family:'Orbitron',monospace;font-size:12px;font-weight:700;letter-spacing:3px;cursor:pointer;transition:all .2s;clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));margin-top:4px;position:relative;overflow:hidden;}
+.btn-primary::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.15),transparent);transition:left .4s;}
+.btn-primary:hover::before{left:100%;}
+.btn-primary:hover{box-shadow:0 0 22px var(--blue-glow);transform:translateY(-1px);}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+.auth-msg{font-family:'Share Tech Mono',monospace;font-size:11px;text-align:center;margin-top:10px;min-height:16px;}
+.auth-msg.err{color:var(--red);}
+.auth-msg.ok{color:var(--green);}
+
+/* ── APP ── */
+#app{display:none;position:relative;z-index:1;min-height:100vh;}
+header{position:sticky;top:0;z-index:50;background:rgba(2,11,24,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border-bright);padding:0 28px;display:flex;align-items:center;justify-content:space-between;height:62px;}
+header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--blue-core),var(--cyan),var(--blue-core),transparent);opacity:.5;}
+.h-brand{display:flex;align-items:center;gap:10px;}
+.h-logo{width:34px;height:34px;border-radius:50%;border:2px solid var(--blue-core);display:flex;align-items:center;justify-content:center;font-size:15px;box-shadow:0 0 10px var(--blue-glow);}
+.h-name{font-family:'Orbitron',monospace;font-size:15px;font-weight:900;letter-spacing:3px;text-shadow:0 0 10px var(--blue-core);}
+.h-name span{color:var(--blue-bright);}
+.h-right{display:flex;align-items:center;gap:14px;}
+.clockd{font-family:'Share Tech Mono',monospace;font-size:13px;color:var(--blue-bright);opacity:.8;}
+.user-badge{display:flex;align-items:center;gap:8px;padding:5px 12px;background:var(--bg-card);border:1px solid var(--border);clip-path:polygon(0 0,calc(100% - 7px) 0,100% 7px,100% 100%,7px 100%,0 calc(100% - 7px));}
+.uname{font-size:15px;font-weight:600;max-width:150px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.role-tag{font-family:'Share Tech Mono',monospace;font-size:9px;padding:2px 7px;letter-spacing:1px;white-space:nowrap;}
+.role-tag.adm{background:var(--blue-dim);border:1px solid var(--blue-core);color:var(--blue-bright);}
+.role-tag.tec{background:#00e67618;border:1px solid var(--green);color:var(--green);}
+.btn-logout{padding:7px 14px;background:transparent;border:1px solid var(--border);color:var(--white-dim);font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:1px;cursor:pointer;transition:all .2s;clip-path:polygon(0 0,calc(100% - 5px) 0,100% 5px,100% 100%,5px 100%,0 calc(100% - 5px));}
+.btn-logout:hover{border-color:var(--red);color:var(--red);}
+
+main{padding:28px;max-width:1400px;margin:0 auto;}
+
+/* MY PANEL */
+.my-panel{background:var(--bg-card);border:1px solid var(--border-bright);padding:22px 24px;margin-bottom:28px;position:relative;clip-path:polygon(0 0,calc(100% - 20px) 0,100% 20px,100% 100%,20px 100%,0 calc(100% - 20px));box-shadow:0 0 28px var(--blue-dim);}
+.my-panel::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--blue-core),var(--cyan),var(--blue-core));}
+.my-panel-title{font-family:'Orbitron',monospace;font-size:11px;letter-spacing:3px;color:var(--blue-bright);margin-bottom:14px;}
+.my-panel-row{display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+.status-btns{display:flex;gap:10px;flex-wrap:wrap;}
+.sbtn{padding:9px 18px;border:1px solid;background:transparent;font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;letter-spacing:1px;cursor:pointer;transition:all .2s;clip-path:polygon(0 0,calc(100% - 7px) 0,100% 7px,100% 100%,7px 100%,0 calc(100% - 7px));display:flex;align-items:center;gap:7px;}
+.sbtn:disabled{opacity:.4;cursor:not-allowed;}
+.sbtn.livre{border-color:var(--green);color:var(--green);}
+.sbtn.livre:hover:not(:disabled),.sbtn.livre.active{background:#00e67620;box-shadow:0 0 12px #00e67640;}
+.sbtn.demanda{border-color:var(--yellow);color:var(--yellow);}
+.sbtn.demanda:hover:not(:disabled),.sbtn.demanda.active{background:#ffd60018;box-shadow:0 0 12px #ffd60040;}
+.sbtn.atendimento{border-color:var(--red);color:var(--red);}
+.sbtn.atendimento:hover:not(:disabled),.sbtn.atendimento.active{background:#ff3b5c18;box-shadow:0 0 12px #ff3b5c40;}
+
+/* STATS */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px;}
+.stat-card{background:var(--bg-card);border:1px solid var(--border);padding:18px;position:relative;clip-path:polygon(0 0,calc(100% - 14px) 0,100% 14px,100% 100%,14px 100%,0 calc(100% - 14px));transition:border-color .2s;}
+.stat-card:hover{border-color:var(--blue-core);}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--blue-core),transparent);opacity:.4;}
+.stat-lbl{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--blue-bright);margin-bottom:6px;}
+.stat-val{font-family:'Orbitron',monospace;font-size:30px;font-weight:700;line-height:1;}
+.stat-val.blue{color:var(--blue-bright);text-shadow:0 0 10px var(--blue-glow);}
+.stat-val.green{color:var(--green);text-shadow:0 0 10px #00e67640;}
+.stat-val.yellow{color:var(--yellow);text-shadow:0 0 10px #ffd60040;}
+.stat-val.red{color:var(--red);text-shadow:0 0 10px #ff3b5c40;}
+
+/* TABS */
+.tab-row{display:flex;margin-bottom:22px;border-bottom:1px solid var(--border);}
+.tab-btn{padding:11px 22px;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--white-dim);font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:600;letter-spacing:1px;cursor:pointer;transition:all .2s;margin-bottom:-1px;}
+.tab-btn:hover{color:var(--white);}
+.tab-btn.active{color:var(--blue-bright);border-bottom-color:var(--blue-core);}
+.tab-pane{display:none;}
+.tab-pane.active{display:block;}
+
+/* FILTERS */
+.filters{display:flex;align-items:center;gap:10px;margin-bottom:22px;flex-wrap:wrap;}
+.fl{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--blue-bright);letter-spacing:2px;}
+.fbtn{padding:6px 14px;background:transparent;border:1px solid var(--border);color:var(--white-dim);font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;letter-spacing:1px;cursor:pointer;transition:all .2s;clip-path:polygon(0 0,calc(100% - 5px) 0,100% 5px,100% 100%,5px 100%,0 calc(100% - 5px));}
+.fbtn:hover{border-color:var(--blue-core);color:var(--white);}
+.fbtn.active{background:var(--blue-dim);border-color:var(--blue-core);color:var(--blue-bright);}
+
+/* SECTION */
+.section{margin-bottom:32px;}
+.sec-hd{display:flex;align-items:center;gap:10px;margin-bottom:14px;padding-bottom:9px;border-bottom:1px solid var(--border);}
+.sec-ico{width:30px;height:30px;display:flex;align-items:center;justify-content:center;font-size:14px;border:1px solid var(--border-bright);background:var(--bg-card);clip-path:polygon(0 0,calc(100% - 5px) 0,100% 5px,100% 100%,5px 100%,0 calc(100% - 5px));}
+.sec-title{font-family:'Orbitron',monospace;font-size:12px;font-weight:700;letter-spacing:2px;}
+.sec-cnt{font-family:'Share Tech Mono',monospace;font-size:10px;padding:2px 8px;background:var(--blue-dim);border:1px solid var(--border);color:var(--blue-bright);}
+.sec-empty{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--white-dim);padding:20px;text-align:center;letter-spacing:2px;}
+
+/* TECH CARDS */
+.tec-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+.tec-card{background:var(--bg-card);border:1px solid var(--border);padding:18px;position:relative;clip-path:polygon(0 0,calc(100% - 16px) 0,100% 16px,100% 100%,16px 100%,0 calc(100% - 16px));transition:all .22s;animation:fadeUp .3s ease forwards;}
+.tec-card:hover{border-color:var(--border-bright);box-shadow:0 0 18px var(--blue-dim);transform:translateY(-2px);}
+.tec-card.sl{border-left:3px solid var(--green);}
+.tec-card.sd{border-left:3px solid var(--yellow);}
+.tec-card.sa{border-left:3px solid var(--red);}
+.tc-top{display:flex;align-items:center;gap:12px;margin-bottom:12px;}
+.tc-avatar{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Orbitron',monospace;font-size:15px;font-weight:700;border:2px solid var(--border-bright);background:linear-gradient(135deg,var(--bg-card2),var(--bg-deep));flex-shrink:0;color:var(--blue-bright);box-shadow:0 0 8px var(--blue-dim);}
+.tc-info{flex:1;min-width:0;}
+.tc-name{font-size:16px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.tc-meta{display:flex;align-items:center;gap:6px;margin-top:3px;}
+.lvl{font-family:'Share Tech Mono',monospace;font-size:9px;padding:2px 7px;letter-spacing:1px;}
+.lvl.aux{background:#00e5ff18;border:1px solid var(--cyan);color:var(--cyan);}
+.lvl.n1{background:var(--blue-dim);border:1px solid var(--blue-core);color:var(--blue-bright);}
+.lvl.n2{background:#ff910018;border:1px solid var(--orange);color:var(--orange);}
+.si{display:flex;align-items:center;gap:6px;padding:7px 11px;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:1px;border:1px solid;clip-path:polygon(0 0,calc(100% - 5px) 0,100% 5px,100% 100%,5px 100%,0 calc(100% - 5px));}
+.si.livre{background:#00e67610;border-color:var(--green);color:var(--green);}
+.si.demanda{background:#ffd60010;border-color:var(--yellow);color:var(--yellow);}
+.si.atendimento{background:#ff3b5c10;border-color:var(--red);color:var(--red);}
+@keyframes pd{0%,100%{opacity:1;}50%{opacity:.25;}}
+.dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.dot.livre{background:var(--green);box-shadow:0 0 5px var(--green);animation:pd 2s infinite;}
+.dot.demanda{background:var(--yellow);box-shadow:0 0 5px var(--yellow);animation:pd 1.5s infinite;}
+.dot.atendimento{background:var(--red);box-shadow:0 0 5px var(--red);animation:pd 1s infinite;}
+.tc-sel{margin-top:10px;}
+.tc-sel label{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--blue-bright);letter-spacing:2px;display:block;margin-bottom:5px;}
+.tc-sel select{width:100%;padding:7px 10px;background:var(--bg-panel);border:1px solid var(--border);color:var(--white);font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:600;outline:none;cursor:pointer;transition:border-color .2s;clip-path:polygon(0 0,calc(100% - 5px) 0,100% 5px,100% 100%,5px 100%,0 calc(100% - 5px));}
+.tc-sel select:focus{border-color:var(--blue-core);}
+.tc-sel select option{background:var(--bg-panel);}
+
+/* MANAGE TABLE */
+.mgr-wrap{overflow-x:auto;}
+.mgr-table{width:100%;border-collapse:collapse;min-width:720px;}
+.mgr-table th{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--blue-bright);text-align:left;padding:10px 14px;border-bottom:1px solid var(--border-bright);background:var(--bg-panel);white-space:nowrap;}
+.mgr-table td{padding:11px 14px;border-bottom:1px solid var(--border);font-size:15px;vertical-align:middle;}
+.mgr-table tr:hover td{background:var(--blue-line);}
+.mgr-table input[type=text]{background:var(--bg-card);border:1px solid var(--border);color:var(--white);font-family:'Rajdhani',sans-serif;font-size:14px;padding:5px 9px;width:175px;outline:none;transition:border-color .2s;}
+.mgr-table input[type=text]:focus{border-color:var(--blue-core);}
+.mgr-table select{background:var(--bg-card);border:1px solid var(--border);color:var(--white);font-family:'Rajdhani',sans-serif;font-size:14px;padding:5px 9px;cursor:pointer;outline:none;}
+.btn-save{padding:5px 12px;background:var(--blue-dim);border:1px solid var(--blue-core);color:var(--blue-bright);font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:1px;cursor:pointer;transition:all .2s;}
+.btn-save:hover{background:var(--blue-core);color:#fff;}
+.btn-del{padding:5px 12px;background:#ff3b5c18;border:1px solid var(--red);color:var(--red);font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:1px;cursor:pointer;transition:all .2s;margin-left:6px;}
+.btn-del:hover{background:var(--red);color:#fff;}
+
+/* TOAST */
+.toast{position:fixed;bottom:28px;right:28px;padding:13px 22px;background:var(--bg-card);border:1px solid var(--blue-core);color:var(--white);font-family:'Share Tech Mono',monospace;font-size:12px;z-index:9999;box-shadow:0 0 18px var(--blue-glow);clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));transform:translateX(calc(100% + 40px));transition:transform .3s;max-width:320px;}
+.toast.show{transform:translateX(0);}
+
+/* MODAL */
+.modal-bg{position:fixed;inset:0;background:rgba(2,11,24,.88);z-index:300;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
+.modal-bg.hidden{display:none;}
+.modal{background:var(--bg-panel);border:1px solid var(--border-bright);padding:36px 32px 28px;width:420px;max-width:94vw;position:relative;box-shadow:0 0 50px var(--blue-glow);clip-path:polygon(0 0,calc(100% - 20px) 0,100% 20px,100% 100%,20px 100%,0 calc(100% - 20px));}
+.modal::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--blue-core),var(--cyan),var(--blue-core),transparent);}
+.modal h2{font-family:'Orbitron',monospace;font-size:14px;letter-spacing:3px;color:var(--white);margin-bottom:22px;}
+.modal-btns{display:flex;gap:10px;margin-top:18px;}
+.btn-cancel{flex:1;padding:11px;background:transparent;border:1px solid var(--border);color:var(--white-dim);font-family:'Orbitron',monospace;font-size:11px;letter-spacing:2px;cursor:pointer;transition:all .2s;clip-path:polygon(0 0,calc(100% - 7px) 0,100% 7px,100% 100%,7px 100%,0 calc(100% - 7px));}
+.btn-cancel:hover{border-color:var(--red);color:var(--red);}
+
+/* PAGE TITLE */
+.pg-title{display:flex;align-items:center;gap:14px;margin-bottom:20px;}
+.pg-title h1{font-family:'Orbitron',monospace;font-size:16px;font-weight:700;letter-spacing:2px;}
+.pg-divider{flex:1;height:1px;background:linear-gradient(90deg,var(--border-bright),transparent);}
+@keyframes pdot{0%,100%{opacity:1;}50%{opacity:.25;}}
+.live-dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 7px var(--green);animation:pdot 2s infinite;}
+.btn-add{padding:8px 16px;background:var(--blue-dim);border:1px solid var(--blue-core);color:var(--blue-bright);font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:1px;cursor:pointer;transition:all .2s;clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px));}
+.btn-add:hover{background:var(--blue-core);color:#fff;}
+
+/* PENDING BADGE */
+.pending-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;background:#ffd60018;border:1px solid var(--yellow);color:var(--yellow);font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:1px;margin-left:8px;}
+
+.hidden{display:none!important;}
+@media(max-width:700px){main{padding:14px;}header{padding:0 14px;}.stats-row{grid-template-columns:repeat(2,1fr);}.tec-grid{grid-template-columns:1fr;}.my-panel-row{flex-direction:column;align-items:flex-start;}.h-name{display:none;}}
+</style>
+</head>
+<body>
+<div class="scanline"></div>
+
+<!-- LOADING -->
+<div class="screen" id="screen-loading">
+  <div class="ld-logo">TÉCNICOS <span>COSTEC</span></div>
+  <div class="ld-bar"></div>
+  <div class="ld-txt">CONECTANDO AO SISTEMA...</div>
+</div>
+
+<!-- LOGIN / REGISTRO -->
+<div class="screen hidden" id="screen-auth">
+  <div class="auth-box">
+    <div class="auth-logo">
+      <div class="icon-ring">🛡️</div>
+      <div class="brand">TÉCNICOS <span>COSTEC</span></div>
+      <div class="sub">SISTEMA DE MONITORAMENTO</div>
+    </div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="switchAuthTab('login')">ENTRAR</button>
+      <button class="auth-tab" onclick="switchAuthTab('register')">CRIAR CONTA</button>
+    </div>
+
+    <!-- LOGIN -->
+    <div class="auth-form active" id="form-login">
+      <div class="fg"><label>// E-MAIL</label><input id="l-email" type="email" placeholder="seu@email.com" autocomplete="off"></div>
+      <div class="fg"><label>// SENHA</label><input id="l-pass" type="password" placeholder="••••••••"></div>
+      <button class="btn-primary" id="btn-login" onclick="doLogin()">[ ACESSAR SISTEMA ]</button>
+      <div class="auth-msg err" id="l-msg"></div>
+    </div>
+
+    <!-- REGISTRO -->
+    <div class="auth-form" id="form-register">
+      <div class="fg"><label>// NOME COMPLETO</label><input id="r-name" type="text" placeholder="Ex: João Silva" autocomplete="off"></div>
+      <div class="fg"><label>// E-MAIL</label><input id="r-email" type="email" placeholder="seu@email.com" autocomplete="off"></div>
+      <div class="fg-row">
+        <div class="fg"><label>// SENHA</label><input id="r-pass" type="password" placeholder="min. 6 chars"></div>
+        <div class="fg">
+          <label>// NÍVEL</label>
+          <select id="r-level">
+            <option value="">— Nível —</option>
+            <option value="aux">AUXILIAR</option>
+            <option value="n1">N1</option>
+            <option value="n2">N2</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn-primary" id="btn-register" onclick="doRegister()">[ CRIAR CONTA ]</button>
+      <div class="auth-msg" id="r-msg"></div>
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <header>
+    <div class="h-brand">
+      <div class="h-logo">🛡️</div>
+      <div class="h-name">TÉCNICOS <span>COSTEC</span></div>
+    </div>
+    <div class="h-right">
+      <div class="clockd" id="clock">00:00:00</div>
+      <div class="user-badge">
+        <span class="uname" id="h-name">--</span>
+        <span class="role-tag" id="h-role">--</span>
+      </div>
+      <button class="btn-logout" onclick="doLogout()">[ SAIR ]</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- MEU STATUS (técnico) -->
+    <div class="my-panel hidden" id="my-panel">
+      <div class="my-panel-title">// MEU STATUS ATUAL</div>
+      <div class="my-panel-row">
+        <div id="my-si"></div>
+        <div class="status-btns">
+          <button class="sbtn livre"       onclick="setSelfStatus('livre')"><span class="dot livre"></span>LIVRE</button>
+          <button class="sbtn demanda"     onclick="setSelfStatus('demanda')"><span class="dot demanda"></span>EM DEMANDA</button>
+          <button class="sbtn atendimento" onclick="setSelfStatus('atendimento')"><span class="dot atendimento"></span>EM ATENDIMENTO</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TABS (ADM) -->
+    <div id="adm-tabs" class="hidden">
+      <div class="tab-row">
+        <button class="tab-btn active" onclick="switchTab('dashboard')">📊 DASHBOARD</button>
+        <button class="tab-btn"        onclick="switchTab('gerenciar')">
+          ⚙️ GERENCIAR TÉCNICOS
+          <span class="pending-badge hidden" id="pending-badge">⏳ <span id="pending-count">0</span> PENDENTE(S)</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div class="tab-pane active" id="tp-dashboard">
+      <div class="pg-title"><h1>PAINEL DE TÉCNICOS</h1><div class="pg-divider"></div><div class="live-dot"></div></div>
+      <div class="stats-row">
+        <div class="stat-card"><div class="stat-lbl">TOTAL</div><div class="stat-val blue" id="st-total">0</div></div>
+        <div class="stat-card"><div class="stat-lbl">LIVRES</div><div class="stat-val green" id="st-livre">0</div></div>
+        <div class="stat-card"><div class="stat-lbl">EM DEMANDA</div><div class="stat-val yellow" id="st-demanda">0</div></div>
+        <div class="stat-card"><div class="stat-lbl">EM ATENDIMENTO</div><div class="stat-val red" id="st-atend">0</div></div>
+      </div>
+      <div class="filters">
+        <span class="fl">FILTRAR:</span>
+        <button class="fbtn active" onclick="setFilter(this,'todos')">TODOS</button>
+        <button class="fbtn" onclick="setFilter(this,'livre')">🟢 LIVRES</button>
+        <button class="fbtn" onclick="setFilter(this,'demanda')">🟡 EM DEMANDA</button>
+        <button class="fbtn" onclick="setFilter(this,'atendimento')">🔴 EM ATENDIMENTO</button>
+        <button class="fbtn" onclick="setFilter(this,'aux')">AUXILIAR</button>
+        <button class="fbtn" onclick="setFilter(this,'n1')">N1</button>
+        <button class="fbtn" onclick="setFilter(this,'n2')">N2</button>
+      </div>
+      <div class="section" id="sec-aux">
+        <div class="sec-hd"><div class="sec-ico">🔧</div><span class="sec-title">AUXILIAR</span><span class="sec-cnt" id="cnt-aux">0</span></div>
+        <div class="tec-grid" id="grid-aux"></div>
+      </div>
+      <div class="section" id="sec-n1">
+        <div class="sec-hd"><div class="sec-ico">⚡</div><span class="sec-title">NÍVEL 1 — N1</span><span class="sec-cnt" id="cnt-n1">0</span></div>
+        <div class="tec-grid" id="grid-n1"></div>
+      </div>
+      <div class="section" id="sec-n2">
+        <div class="sec-hd"><div class="sec-ico">🎯</div><span class="sec-title">NÍVEL 2 — N2</span><span class="sec-cnt" id="cnt-n2">0</span></div>
+        <div class="tec-grid" id="grid-n2"></div>
+      </div>
+    </div>
+
+    <!-- GERENCIAR (ADM) -->
+    <div class="tab-pane" id="tp-gerenciar">
+      <div class="pg-title">
+        <h1>GERENCIAR TÉCNICOS</h1>
+        <div class="pg-divider"></div>
+        <button class="btn-add" onclick="openAddModal()">+ ADICIONAR TÉCNICO</button>
+      </div>
+
+      <!-- PENDENTES -->
+      <div id="pending-section" class="hidden" style="margin-bottom:28px;">
+        <div class="sec-hd"><div class="sec-ico">⏳</div><span class="sec-title" style="color:var(--yellow)">AGUARDANDO APROVAÇÃO</span><span class="sec-cnt" id="cnt-pending" style="border-color:var(--yellow);color:var(--yellow);">0</span></div>
+        <div class="mgr-wrap"><table class="mgr-table"><thead><tr><th>NOME</th><th>E-MAIL</th><th>NÍVEL SOLICITADO</th><th>AÇÕES</th></tr></thead><tbody id="pending-tbody"></tbody></table></div>
+      </div>
+
+      <div class="sec-hd"><div class="sec-ico">👥</div><span class="sec-title">TÉCNICOS ATIVOS</span><span class="sec-cnt" id="cnt-active">0</span></div>
+      <div class="mgr-wrap">
+        <table class="mgr-table">
+          <thead><tr><th>NOME</th><th>E-MAIL</th><th>NÍVEL</th><th>STATUS</th><th>AÇÕES</th></tr></thead>
+          <tbody id="mgr-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- MODAL ADD TÉCNICO -->
+<div class="modal-bg hidden" id="modal-bg">
+  <div class="modal">
+    <h2>ADICIONAR TÉCNICO</h2>
+    <div class="fg"><label>// NOME COMPLETO</label><input id="m-name" type="text" placeholder="Nome do técnico"></div>
+    <div class="fg"><label>// E-MAIL</label><input id="m-email" type="email" placeholder="email@exemplo.com"></div>
+    <div class="fg-row">
+      <div class="fg"><label>// SENHA INICIAL</label><input id="m-pass" type="password" placeholder="min. 6 chars"></div>
+      <div class="fg">
+        <label>// NÍVEL</label>
+        <select id="m-level"><option value="aux">AUXILIAR</option><option value="n1">N1</option><option value="n2">N2</option></select>
+      </div>
+    </div>
+    <div class="auth-msg err" id="m-msg"></div>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeModal()">[ CANCELAR ]</button>
+      <button class="btn-primary" style="flex:1" id="btn-modal-save" onclick="saveModal()">[ SALVAR ]</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- ══════════════ FIREBASE SDK ══════════════ -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+import {
+  getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
+  signOut, onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
+import {
+  getFirestore, doc, setDoc, getDoc, updateDoc, deleteDoc,
+  collection, onSnapshot, query, where, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+
+/* ── CONFIG ── */
+const firebaseConfig = {
+  apiKey: "AIzaSyDL34diKQUo4OU6cupUOaKYCEJQa_TBVTE",
+  authDomain: "sistema-de-controle-5f59a.firebaseapp.com",
+  projectId: "sistema-de-controle-5f59a",
+  storageBucket: "sistema-de-controle-5f59a.firebasestorage.app",
+  messagingSenderId: "46440163087",
+  appId: "1:46440163087:web:862e4500c2fc1ee257c07a"
+};
+
+const app  = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db   = getFirestore(app);
+
+/* ── CONSTANTS ── */
+const SL  = {livre:'LIVRE', demanda:'EM DEMANDA', atendimento:'EM ATENDIMENTO'};
+const LVL = {aux:'AUXILIAR', n1:'N1', n2:'N2'};
+const ADMIN_EMAIL = "admin@costec.com"; // primeiro admin - mude conforme necessário
+
+/* ── STATE ── */
+let ME = null;          // { uid, name, email, role, level, status }
+let allTechs = [];      // lista reativa do Firestore
+let pendingUsers = [];  // cadastros aguardando aprovação
+let activeFilter = 'todos';
+let unsubTechs = null;
+let unsubPending = null;
+
+/* ══════════════════════════════
+   AUTH STATE OBSERVER
+══════════════════════════════ */
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    const snap = await getDoc(doc(db, 'users', user.uid));
+    if (!snap.exists()) {
+      // conta criada mas sem perfil ainda (raro)
+      await signOut(auth);
+      showScreen('auth');
+      return;
+    }
+    const data = snap.data();
+    if (data.status === 'pending') {
+      showToast('⏳ SUA CONTA AINDA AGUARDA APROVAÇÃO DO ADMINISTRADOR.');
+      await signOut(auth);
+      showScreen('auth');
+      setMsg('l-msg','⏳ Conta aguardando aprovação.','err');
+      return;
+    }
+    ME = { uid: user.uid, ...data };
+    enterApp();
+  } else {
+    ME = null;
+    if (unsubTechs)   { unsubTechs();   unsubTechs = null; }
+    if (unsubPending) { unsubPending(); unsubPending = null; }
+    showScreen('auth');
+  }
+});
+
+/* ══════════════════════════════
+   LOGIN
+══════════════════════════════ */
+window.doLogin = async function() {
+  const email = $('l-email').value.trim();
+  const pass  = $('l-pass').value;
+  setMsg('l-msg','');
+  if (!email || !pass) { setMsg('l-msg','⚠ PREENCHA TODOS OS CAMPOS','err'); return; }
+  setBtn('btn-login', true, '...');
+  try {
+    await signInWithEmailAndPassword(auth, email, pass);
+  } catch(e) {
+    setMsg('l-msg', firebaseError(e), 'err');
+    setBtn('btn-login', false, '[ ACESSAR SISTEMA ]');
+  }
+};
+
+/* ══════════════════════════════
+   REGISTER
+══════════════════════════════ */
+window.doRegister = async function() {
+  const name  = $('r-name').value.trim();
+  const email = $('r-email').value.trim();
+  const pass  = $('r-pass').value;
+  const level = $('r-level').value;
+  setMsg('r-msg','');
+  if (!name)  { setMsg('r-msg','⚠ INFORME SEU NOME','err'); return; }
+  if (!email) { setMsg('r-msg','⚠ INFORME SEU E-MAIL','err'); return; }
+  if (pass.length < 6) { setMsg('r-msg','⚠ SENHA MÍNIMA: 6 CARACTERES','err'); return; }
+  if (!level) { setMsg('r-msg','⚠ SELECIONE SEU NÍVEL','err'); return; }
+  setBtn('btn-register', true, '...');
+  try {
+    const cred = await createUserWithEmailAndPassword(auth, email, pass);
+    const uid  = cred.user.uid;
+    // Salva perfil no Firestore com status "pending" (aguarda aprovação do ADM)
+    await setDoc(doc(db, 'users', uid), {
+      uid, name, email, level, role: 'tec',
+      status: 'pending',      // pendente de aprovação
+      tecStatus: 'livre',     // status operacional
+      createdAt: serverTimestamp()
+    });
+    await signOut(auth);
+    setMsg('r-msg','✔ CONTA CRIADA! AGUARDE APROVAÇÃO DO ADMINISTRADOR.','ok');
+    $('r-name').value = ''; $('r-email').value = ''; $('r-pass').value = ''; $('r-level').value = '';
+  } catch(e) {
+    setMsg('r-msg', firebaseError(e), 'err');
+  }
+  setBtn('btn-register', false, '[ CRIAR CONTA ]');
+};
+
+/* ══════════════════════════════
+   LOGOUT
+══════════════════════════════ */
+window.doLogout = async function() {
+  await signOut(auth);
+};
+
+/* ══════════════════════════════
+   ENTER APP
+══════════════════════════════ */
+function enterApp() {
+  showScreen('app');
+  $('h-name').textContent = ME.name;
+  const rel = $('h-role');
+  rel.textContent  = ME.role === 'adm' ? 'ADMIN' : 'TÉCNICO';
+  rel.className    = 'role-tag ' + ME.role;
+
+  if (ME.role === 'tec') {
+    show('my-panel'); hide('adm-tabs');
+    $('tp-gerenciar').classList.remove('active');
+    $('tp-dashboard').classList.add('active');
+    updateMyPanel();
+  } else {
+    hide('my-panel'); show('adm-tabs');
+    listenPending();
+  }
+  activeFilter = 'todos';
+  document.querySelectorAll('.fbtn').forEach((b,i) => b.classList.toggle('active', i === 0));
+  listenTechs();
+}
+
+/* ══════════════════════════════
+   REALTIME LISTENERS
+══════════════════════════════ */
+function listenTechs() {
+  if (unsubTechs) unsubTechs();
+  const q = query(collection(db, 'users'), where('role','==','tec'), where('status','==','active'));
+  unsubTechs = onSnapshot(q, snap => {
+    allTechs = snap.docs.map(d => d.data());
+    // Atualiza painel do próprio técnico
+    if (ME && ME.role === 'tec') {
+      const me = allTechs.find(t => t.uid === ME.uid);
+      if (me) ME.tecStatus = me.tecStatus;
+      updateMyPanel();
+    }
+    renderDashboard();
+    if (ME && ME.role === 'adm' && $('tp-gerenciar').classList.contains('active')) renderManage();
+  });
+}
+
+function listenPending() {
+  if (unsubPending) unsubPending();
+  const q = query(collection(db, 'users'), where('status','==','pending'));
+  unsubPending = onSnapshot(q, snap => {
+    pendingUsers = snap.docs.map(d => d.data());
+    const cnt = pendingUsers.length;
+    const badge = $('pending-badge');
+    if (cnt > 0) { show(badge); $('pending-count').textContent = cnt; }
+    else hide(badge);
+    if ($('tp-gerenciar').classList.contains('active')) renderManage();
+  });
+}
+
+/* ══════════════════════════════
+   SELF STATUS
+══════════════════════════════ */
+window.setSelfStatus = async function(s) {
+  if (!ME || ME.role !== 'tec') return;
+  document.querySelectorAll('.sbtn').forEach(b => b.disabled = true);
+  try {
+    await updateDoc(doc(db, 'users', ME.uid), { tecStatus: s });
+    ME.tecStatus = s;
+    updateMyPanel();
+    showToast('✔ STATUS: ' + SL[s]);
+  } catch(e) { showToast('⚠ ERRO AO ATUALIZAR STATUS'); }
+  document.querySelectorAll('.sbtn').forEach(b => b.disabled = false);
+};
+
+function updateMyPanel() {
+  const s = ME.tecStatus || 'livre';
+  $('my-si').innerHTML = `<div class="si ${s}"><span class="dot ${s}"></span>${SL[s]}</div>`;
+  document.querySelectorAll('.sbtn').forEach(b => b.classList.toggle('active', b.classList.contains(s)));
+}
+
+/* ══════════════════════════════
+   DASHBOARD RENDER
+══════════════════════════════ */
+function renderDashboard() {
+  // stats
+  $('st-total').textContent   = allTechs.length;
+  $('st-livre').textContent   = allTechs.filter(t => t.tecStatus === 'livre').length;
+  $('st-demanda').textContent = allTechs.filter(t => t.tecStatus === 'demanda').length;
+  $('st-atend').textContent   = allTechs.filter(t => t.tecStatus === 'atendimento').length;
+  // grids
+  ['aux','n1','n2'].forEach(renderGrid);
+}
+
+function renderGrid(lvl) {
+  let techs = allTechs.filter(t => t.level === lvl);
+  const f = activeFilter;
+  if (['livre','demanda','atendimento'].includes(f)) techs = techs.filter(t => t.tecStatus === f);
+  else if (f !== 'todos' && f !== lvl) techs = [];
+
+  const sec = $('sec-' + lvl);
+  sec.style.display = (techs.length === 0 && f !== 'todos') ? 'none' : 'block';
+  $('cnt-' + lvl).textContent = techs.length;
+
+  const isAdm = ME && ME.role === 'adm';
+
+  if (techs.length === 0) {
+    $('grid-' + lvl).innerHTML = `<div class="sec-empty">// NENHUM TÉCNICO ${f !== 'todos' ? 'COM ESTE FILTRO' : 'NESTE NÍVEL'}</div>`;
+    return;
+  }
+
+  $('grid-' + lvl).innerHTML = techs.map(t => {
+    const s   = t.tecStatus || 'livre';
+    const cls = s === 'livre' ? 'sl' : s === 'demanda' ? 'sd' : 'sa';
+    const ini = t.name.split(' ').slice(0,2).map(x => x[0]).join('').toUpperCase();
+    const canEdit = isAdm || (ME && ME.uid === t.uid);
+    const sel = canEdit ? `
+      <div class="tc-sel">
+        <label>// ALTERAR STATUS</label>
+        <select onchange="quickStatus('${t.uid}',this.value)">
+          <option value="livre"       ${s==='livre'?'selected':''}>🟢 LIVRE</option>
+          <option value="demanda"     ${s==='demanda'?'selected':''}>🟡 EM DEMANDA</option>
+          <option value="atendimento" ${s==='atendimento'?'selected':''}>🔴 EM ATENDIMENTO</option>
+        </select>
+      </div>` : '';
+    return `
+      <div class="tec-card ${cls}">
+        <div class="tc-top">
+          <div class="tc-avatar">${esc(ini)}</div>
+          <div class="tc-info">
+            <div class="tc-name">${esc(t.name)}</div>
+            <div class="tc-meta"><span class="lvl ${lvl}">${LVL[lvl]}</span></div>
+          </div>
+        </div>
+        <div class="si ${s}"><span class="dot ${s}"></span>${SL[s]}</div>
+        ${sel}
+      </div>`;
+  }).join('');
+}
+
+window.quickStatus = async function(uid, s) {
+  try {
+    await updateDoc(doc(db, 'users', uid), { tecStatus: s });
+    if (ME && ME.uid === uid) { ME.tecStatus = s; updateMyPanel(); }
+    showToast('✔ STATUS ATUALIZADO');
+  } catch(e) { showToast('⚠ ERRO: ' + e.message); }
+};
+
+/* ══════════════════════════════
+   MANAGE TABLE (ADM)
+══════════════════════════════ */
+function renderManage() {
+  // Pendentes
+  const pendSec = $('pending-section');
+  if (pendingUsers.length > 0) {
+    show(pendSec);
+    $('cnt-pending').textContent = pendingUsers.length;
+    $('pending-tbody').innerHTML = pendingUsers.map(u => `
+      <tr>
+        <td><strong>${esc(u.name)}</strong></td>
+        <td style="font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--blue-bright)">${esc(u.email)}</td>
+        <td><span class="lvl ${u.level}">${LVL[u.level]||u.level}</span></td>
+        <td>
+          <button class="btn-save" onclick="approveUser('${u.uid}','${esc(u.level)}')">✔ APROVAR</button>
+          <button class="btn-del"  onclick="rejectUser('${u.uid}')">✖ REJEITAR</button>
+        </td>
+      </tr>`).join('');
+  } else {
+    hide(pendSec);
+  }
+
+  // Ativos
+  $('cnt-active').textContent = allTechs.length;
+  $('mgr-tbody').innerHTML = allTechs.map(t => {
+    const s = t.tecStatus || 'livre';
+    return `
+      <tr>
+        <td><input type="text" value="${esc(t.name)}" id="mn-${t.uid}" style="width:175px"></td>
+        <td style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--blue-bright)">${esc(t.email)}</td>
+        <td>
+          <select id="ml-${t.uid}" onchange="admLevel('${t.uid}',this.value)">
+            <option value="aux" ${t.level==='aux'?'selected':''}>AUXILIAR</option>
+            <option value="n1"  ${t.level==='n1'?'selected':''}>N1</option>
+            <option value="n2"  ${t.level==='n2'?'selected':''}>N2</option>
+          </select>
+        </td>
+        <td>
+          <select onchange="admStatus('${t.uid}',this.value)">
+            <option value="livre"       ${s==='livre'?'selected':''}>🟢 LIVRE</option>
+            <option value="demanda"     ${s==='demanda'?'selected':''}>🟡 EM DEMANDA</option>
+            <option value="atendimento" ${s==='atendimento'?'selected':''}>🔴 EM ATENDIMENTO</option>
+          </select>
+        </td>
+        <td>
+          <button class="btn-save" onclick="admSaveName('${t.uid}')">SALVAR</button>
+          <button class="btn-del"  onclick="admDelete('${t.uid}','${esc(t.email)}')">EXCLUIR</button>
+        </td>
+      </tr>`;
+  }).join('');
+}
+
+/* ── ADM ACTIONS ── */
+window.approveUser = async function(uid, level) {
+  try {
+    await updateDoc(doc(db, 'users', uid), { status: 'active' });
+    showToast('✔ TÉCNICO APROVADO!');
+  } catch(e) { showToast('⚠ ERRO: ' + e.message); }
+};
+
+window.rejectUser = async function(uid) {
+  if (!confirm('Rejeitar e excluir esta conta?')) return;
+  try {
+    await deleteDoc(doc(db, 'users', uid));
+    showToast('✔ CONTA REJEITADA E REMOVIDA');
+  } catch(e) { showToast('⚠ ERRO: ' + e.message); }
+};
+
+window.admStatus = async function(uid, s) {
+  try {
+    await updateDoc(doc(db, 'users', uid), { tecStatus: s });
+    if (ME && ME.uid === uid) { ME.tecStatus = s; updateMyPanel(); }
+    showToast('✔ STATUS ATUALIZADO');
+  } catch(e) { showToast('⚠ ERRO: ' + e.message); }
+};
+
+window.admLevel = async function(uid, lvl) {
+  try {
+    await updateDoc(doc(db, 'users', uid), { level: lvl });
+    showToast('✔ NÍVEL ATUALIZADO');
+  } catch(e) { showToast('⚠ ERRO: ' + e.message); }
+};
+
+window.admSaveName = async function(uid) {
+  const v = ($('mn-' + uid)||{}).value?.trim();
+  if (!v) { showToast('⚠ NOME NÃO PODE SER VAZIO'); return; }
+  try {
+    await updateDoc(doc(db, 'users', uid), { name: v });
+    showToast('✔ NOME ATUALIZADO: ' + v);
+  } catch(e) { showToast('⚠ ERRO: ' + e.message); }
+};
+
+window.admDelete = async function(uid, email) {
+  if (!confirm(`Excluir o técnico ${email}? Esta ação não pode ser desfeita.`)) return;
+  try {
+    await deleteDoc(doc(db, 'users', uid));
+    showToast('✔ TÉCNICO REMOVIDO');
+  } catch(e) { showToast('⚠ ERRO: ' + e.message); }
+};
+
+/* ── ADD MODAL ── */
+window.openAddModal = function() {
+  ['m-name','m-email','m-pass'].forEach(i => $(i).value = '');
+  $('m-level').value = 'aux';
+  setMsg('m-msg','');
+  show('modal-bg');
+};
+window.closeModal = function() { hide('modal-bg'); };
+
+window.saveModal = async function() {
+  const name  = $('m-name').value.trim();
+  const email = $('m-email').value.trim();
+  const pass  = $('m-pass').value;
+  const level = $('m-level').value;
+  setMsg('m-msg','');
+  if (!name)       { setMsg('m-msg','⚠ INFORME O NOME','err'); return; }
+  if (!email)      { setMsg('m-msg','⚠ INFORME O E-MAIL','err'); return; }
+  if (pass.length < 6) { setMsg('m-msg','⚠ SENHA MÍNIMA: 6 CARACTERES','err'); return; }
+  setBtn('btn-modal-save', true, '...');
+  try {
+    // Cria conta no Auth e perfil no Firestore já aprovado (criado pelo ADM)
+    const cred = await createUserWithEmailAndPassword(auth, email, pass);
+    const uid  = cred.user.uid;
+    await setDoc(doc(db, 'users', uid), {
+      uid, name, email, level, role: 'tec',
+      status: 'active', tecStatus: 'livre',
+      createdAt: serverTimestamp()
+    });
+    // Re-autentica o admin (Firebase troca o currentUser ao criar conta)
+    closeModal();
+    showToast('✔ TÉCNICO ADICIONADO: ' + name);
+    showToast('⚠ VOCÊ FOI DESLOGADO. POR FAVOR, FAÇA LOGIN NOVAMENTE.');
+    await signOut(auth);
+  } catch(e) {
+    setMsg('m-msg', firebaseError(e), 'err');
+  }
+  setBtn('btn-modal-save', false, '[ SALVAR ]');
+};
+
+/* ══════════════════════════════
+   FILTER / TABS
+══════════════════════════════ */
+window.setFilter = function(btn, f) {
+  activeFilter = f;
+  document.querySelectorAll('.fbtn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderDashboard();
+};
+
+window.switchTab = function(t) {
+  document.querySelectorAll('.tab-btn').forEach((b,i) =>
+    b.classList.toggle('active', (i===0&&t==='dashboard')||(i===1&&t==='gerenciar')));
+  $('tp-dashboard').classList.toggle('active', t === 'dashboard');
+  $('tp-gerenciar').classList.toggle('active', t === 'gerenciar');
+  if (t === 'gerenciar') renderManage();
+};
+
+window.switchAuthTab = function(t) {
+  document.querySelectorAll('.auth-tab').forEach((b,i) =>
+    b.classList.toggle('active', (i===0&&t==='login')||(i===1&&t==='register')));
+  $('form-login').classList.toggle('active', t === 'login');
+  $('form-register').classList.toggle('active', t === 'register');
+  setMsg('l-msg',''); setMsg('r-msg','');
+};
+
+/* ══════════════════════════════
+   UTILS
+══════════════════════════════ */
+function showScreen(name) {
+  hide('screen-loading'); hide('screen-auth');
+  document.getElementById('app').style.display = 'none';
+  if (name === 'loading') show('screen-loading');
+  else if (name === 'auth') show('screen-auth');
+  else document.getElementById('app').style.display = 'block';
+}
+function $(id){ return document.getElementById(id); }
+function show(el){ (typeof el==='string'?$(el):el)?.classList.remove('hidden'); }
+function hide(el){ (typeof el==='string'?$(el):el)?.classList.add('hidden'); }
+function esc(s){ const d=document.createElement('div');d.textContent=String(s||'');return d.innerHTML; }
+function setMsg(id,msg,cls=''){
+  const el=$(id); if(!el) return;
+  el.textContent=msg; el.className='auth-msg'+(cls?' '+cls:'');
+}
+function setBtn(id,disabled,label){
+  const el=$(id); if(!el) return;
+  el.disabled=disabled; el.textContent=label;
+}
+function showToast(msg){
+  const t=$('toast'); t.textContent=msg; t.classList.add('show');
+  clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),3000);
+}
+function firebaseError(e){
+  const map={
+    'auth/email-already-in-use':'⚠ E-MAIL JÁ CADASTRADO',
+    'auth/invalid-email':'⚠ E-MAIL INVÁLIDO',
+    'auth/weak-password':'⚠ SENHA MUITO FRACA (MÍN. 6 CHARS)',
+    'auth/user-not-found':'⚠ USUÁRIO NÃO ENCONTRADO',
+    'auth/wrong-password':'⚠ SENHA INCORRETA',
+    'auth/invalid-credential':'⚠ E-MAIL OU SENHA INVÁLIDOS',
+    'auth/too-many-requests':'⚠ MUITAS TENTATIVAS. TENTE MAIS TARDE.',
+  };
+  return map[e.code] || ('⚠ ERRO: ' + e.message);
+}
+
+/* ── CLOCK ── */
+function updateClock(){
+  const n=new Date();
+  $('clock').textContent=
+    String(n.getHours()).padStart(2,'0')+':'+
+    String(n.getMinutes()).padStart(2,'0')+':'+
+    String(n.getSeconds()).padStart(2,'0');
+}
+setInterval(updateClock,1000); updateClock();
+
+/* ── ENTER KEY ── */
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    if (!$('screen-auth').classList.contains('hidden')) {
+      $('form-login').classList.contains('active') ? window.doLogin() : window.doRegister();
+    }
+    if (!$('modal-bg').classList.contains('hidden')) window.saveModal();
+  }
+  if (e.key === 'Escape') window.closeModal?.();
+});
+
+</script>
+</body>
+</html>
